@@ -53,7 +53,7 @@ export const getFarms = (sushi) => {
           tokenAddress,
           tokenSymbol,
           tokenContract,
-          earnToken: 'sushi',
+          earnToken: 'wine',
           earnTokenAddress: sushi.contracts.sushi.options.address,
           icon,
         }),
@@ -124,6 +124,14 @@ export const approve = async (lpContract, masterChefContract, account) => {
 
 export const getSushiSupply = async (sushi) => {
   return new BigNumber(await sushi.contracts.sushi.methods.totalSupply().call())
+}
+
+export const getFoodbank = async (sushi) => {
+  return new BigNumber(await sushi.contracts.sushi.methods.food().call())
+}
+
+export const getOven = async (sushi) => {
+  return new BigNumber(await sushi.contracts.sushi.methods.oven().call())
 }
 
 export const stake = async (masterChefContract, pid, amount, account) => {

@@ -9,13 +9,16 @@ import Label from '../../../components/Label'
 import Spacer from '../../../components/Spacer'
 import Value from '../../../components/Value'
 import SushiIcon from '../../../components/SushiIcon'
+import FireIcon from '../../../components/FireIcon'
+import BankIcon from '../../../components/BankIcon'
 import useAllEarnings from '../../../hooks/useAllEarnings'
 import useAllStakedValue from '../../../hooks/useAllStakedValue'
 import useFarms from '../../../hooks/useFarms'
 import useTokenBalance from '../../../hooks/useTokenBalance'
 import useSushi from '../../../hooks/useSushi'
-import { getSushiAddress, getSushiSupply } from '../../../sushi/utils'
+import { getSushiAddress, getSushiSupply, getFoodbank, getOven } from '../../../sushi/utils'
 import { getBalanceNumber } from '../../../utils/formatBalance'
+import { getNodeMajorVersion } from 'typescript'
 
 const PendingRewards: React.FC = () => {
   const [start, setStart] = useState(0)
@@ -71,6 +74,9 @@ const PendingRewards: React.FC = () => {
 
 const Balances: React.FC = () => {
   const [totalSupply, setTotalSupply] = useState<BigNumber>()
+  const [foodbank, setFoodbank] = useState<BigNumber>()
+  const [oven, setOven] = useState<BigNumber>()
+
   const sushi = useSushi()
   const sushiBalance = useTokenBalance(getSushiAddress(sushi))
   const { account, ethereum }: { account: any; ethereum: any } = useWallet()
@@ -80,12 +86,23 @@ const Balances: React.FC = () => {
       const supply = await getSushiSupply(sushi)
       setTotalSupply(supply)
     }
+    async function fetchFoodbank() {
+      const food = await getFoodbank(sushi)
+      setFoodbank(food)
+    }
+    async function fetchOven() {
+      const burn = await getOven(sushi)
+      setOven(burn)
+    }
     if (sushi) {
       fetchTotalSupply()
+      fetchFoodbank()
+      fetchOven()
     }
-  }, [sushi, setTotalSupply])
+  }, [sushi, setTotalSupply, setFoodbank, setOven])
 
   return (
+    <>
     <StyledWrapper>
       <Card>
         <CardContent>
@@ -94,7 +111,7 @@ const Balances: React.FC = () => {
               <SushiIcon />
               <Spacer />
               <div style={{ flex: 1 }}>
-                <Label text="Your SUSHI Balance" />
+                <Label text="Your PASTA Balance" />
                 <Value
                   value={!!account ? getBalanceNumber(sushiBalance) : 'Locked'}
                 />
@@ -102,28 +119,63 @@ const Balances: React.FC = () => {
             </StyledBalance>
           </StyledBalances>
         </CardContent>
-        <Footnote>
-          Pending harvest
-          <FootnoteValue>
-            <PendingRewards /> SUSHI
-          </FootnoteValue>
-        </Footnote>
       </Card>
       <Spacer />
-
       <Card>
         <CardContent>
-          <Label text="Total SUSHI Supply" />
-          <Value
-            value={totalSupply ? getBalanceNumber(totalSupply) : 'Locked'}
-          />
+          <StyledBalances>
+            <StyledBalance>
+              <SushiIcon />
+              <Spacer />
+              <div style={{ flex: 1 }}>
+                <Label text="Total PASTA Supply" />
+                <Value
+                  value={totalSupply ? getBalanceNumber(totalSupply) : 'Locked'}
+                />
+              </div>
+            </StyledBalance>
+          </StyledBalances>
         </CardContent>
-        <Footnote>
-          New rewards per block
-          <FootnoteValue>1,000 SUSHI</FootnoteValue>
-        </Footnote>
       </Card>
     </StyledWrapper>
+    <Spacer />
+    <StyledWrapper>
+        <Card>
+          <CardContent>
+            <StyledBalances>
+                <StyledBalance>
+                  <BankIcon />
+                  <Spacer />
+                  <div style={{ flex: 1 }}>
+                    <Label text="PASTA in the foodbank" />
+                    <Value
+                      value={foodbank ? getBalanceNumber(foodbank) : 'Locked'}
+                    />
+                  </div>
+                </StyledBalance>
+              </StyledBalances>
+
+          </CardContent>
+        </Card>
+        <Spacer />
+        <Card>
+          <CardContent>
+            <StyledBalances>
+              <StyledBalance>
+                <FireIcon />
+                <Spacer />
+                <div style={{ flex: 1 }}>
+                  <Label text="PASTA waiting to be burned" />
+                  <Value
+                    value={oven ? getBalanceNumber(oven) : 'Locked'}
+                  />
+                </div>
+              </StyledBalance>
+            </StyledBalances>
+          </CardContent>
+        </Card>
+      </StyledWrapper>
+      </>
   )
 }
 

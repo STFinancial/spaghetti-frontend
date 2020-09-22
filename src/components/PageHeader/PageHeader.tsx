@@ -4,16 +4,14 @@ import styled from 'styled-components'
 import Container from '../Container'
 
 interface PageHeaderProps {
-  icon: React.ReactNode
   subtitle?: string
   title?: string
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ icon, subtitle, title }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ subtitle, title }) => {
   return (
     <Container size="sm">
       <StyledPageHeader>
-        <StyledIcon>{icon}</StyledIcon>
         <StyledTitle>{title}</StyledTitle>
         <StyledSubtitle>{subtitle}</StyledSubtitle>
       </StyledPageHeader>
@@ -40,7 +38,6 @@ const StyledIcon = styled.div`
 `
 
 const StyledTitle = styled.h1`
-  font-family: 'Kaushan Script', sans-serif;
   color: ${(props) => props.theme.color.grey[600]};
   font-size: 36px;
   font-weight: 700;

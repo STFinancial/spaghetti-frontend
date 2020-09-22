@@ -28,7 +28,7 @@ const FarmCards: React.FC = () => {
   const stakedValue = useAllStakedValue()
 
   const sushiIndex = farms.findIndex(
-    ({ tokenSymbol }) => tokenSymbol === 'SUSHI',
+    ({ tokenSymbol }) => tokenSymbol === 'PASTA',
   )
 
   const sushiPrice =
@@ -124,11 +124,10 @@ const FarmCard: React.FC<FarmCardProps> = ({ farm }) => {
     }
   }, [sushi, lpTokenAddress, account, setHarvestable])
 
-  const poolActive = true // startTime * 1000 - Date.now() <= 0
+  const poolActive = true
 
   return (
     <StyledCardWrapper>
-      {farm.tokenSymbol === 'SUSHI' && <StyledCardAccent />}
       <Card>
         <CardContent>
           <StyledContent>
@@ -151,30 +150,6 @@ const FarmCard: React.FC<FarmCardProps> = ({ farm }) => {
                 />
               )}
             </Button>
-            <StyledInsight>
-              <span>APY</span>
-              <span>
-                {farm.apy
-                  ? `${farm.apy
-                      .times(new BigNumber(100))
-                      .toNumber()
-                      .toLocaleString('en-US')
-                      .slice(0, -1)}%`
-                  : 'Loading ...'}
-              </span>
-              {/* <span>
-                {farm.tokenAmount
-                  ? (farm.tokenAmount.toNumber() || 0).toLocaleString('en-US')
-                  : '-'}{' '}
-                {farm.tokenSymbol}
-              </span>
-              <span>
-                {farm.wethAmount
-                  ? (farm.wethAmount.toNumber() || 0).toLocaleString('en-US')
-                  : '-'}{' '}
-                ETH
-              </span> */}
-            </StyledInsight>
           </StyledContent>
         </CardContent>
       </Card>
