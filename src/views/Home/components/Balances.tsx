@@ -11,6 +11,7 @@ import Value from '../../../components/Value'
 import SushiIcon from '../../../components/SushiIcon'
 import FireIcon from '../../../components/FireIcon'
 import BankIcon from '../../../components/BankIcon'
+import DollarIcon from '../../../components/DollarIcon'
 import useAllEarnings from '../../../hooks/useAllEarnings'
 import useAllStakedValue from '../../../hooks/useAllStakedValue'
 import useFarms from '../../../hooks/useFarms'
@@ -19,6 +20,7 @@ import useSushi from '../../../hooks/useSushi'
 import { getSushiAddress, getSushiSupply, getFoodbank, getOven } from '../../../sushi/utils'
 import { getBalanceNumber } from '../../../utils/formatBalance'
 import { getNodeMajorVersion } from 'typescript'
+import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants'
 
 const PendingRewards: React.FC = () => {
   const [start, setStart] = useState(0)
@@ -76,6 +78,7 @@ const Balances: React.FC = () => {
   const [totalSupply, setTotalSupply] = useState<BigNumber>()
   const [foodbank, setFoodbank] = useState<BigNumber>()
   const [oven, setOven] = useState<BigNumber>()
+  const [pastaPrice, setPastaPrice] = useState(0)
 
   const sushi = useSushi()
   const sushiBalance = useTokenBalance(getSushiAddress(sushi))
@@ -94,12 +97,29 @@ const Balances: React.FC = () => {
       const burn = await getOven(sushi)
       setOven(burn)
     }
+    async function fetchPastaPrice() {
+      fetch("https://api.coingecko.com/api/v3/simple/price?ids=spaghetti&vs_currencies=usd")
+      .then(res => res.json())
+      .then(
+        (result) => {
+          console.log(result)
+          setPastaPrice(result["spaghetti"].usd)
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setPastaPrice(0)
+        }
+      )
+    }
     if (sushi) {
       fetchTotalSupply()
       fetchFoodbank()
       fetchOven()
+      fetchPastaPrice()
     }
-  }, [sushi, setTotalSupply, setFoodbank, setOven])
+  }, [sushi, setTotalSupply, setFoodbank, setOven, setPastaPrice])
 
   return (
     <>
@@ -154,7 +174,6 @@ const Balances: React.FC = () => {
                   </div>
                 </StyledBalance>
               </StyledBalances>
-
           </CardContent>
         </Card>
         <Spacer />
@@ -168,6 +187,42 @@ const Balances: React.FC = () => {
                   <Label text="PASTA waiting to be burned" />
                   <Value
                     value={oven ? getBalanceNumber(oven) : 'Locked'}
+                  />
+                </div>
+              </StyledBalance>
+            </StyledBalances>
+          </CardContent>
+        </Card>
+      </StyledWrapper>
+      <Spacer />
+    <StyledWrapper>
+        <Card>
+          <CardContent>
+            <StyledBalances>
+                <StyledBalance>
+                  <DollarIcon />
+                  <Spacer />
+                  <div style={{ flex: 1 }}>
+                    <Label text="PASTA Price" />
+                    <Value
+                      value={pastaPrice ? pastaPrice : 'Locked'}
+                    />
+                  </div>
+                </StyledBalance>
+              </StyledBalances>
+          </CardContent>
+        </Card>
+        <Spacer />
+        <Card>
+          <CardContent>
+            <StyledBalances>
+              <StyledBalance>
+                <DollarIcon />
+                <Spacer />
+                <div style={{ flex: 1 }}>
+                  <Label text="PASTA Market Cap" />
+                  <Value
+                    value={pastaPrice && totalSupply ? getBalanceNumber(totalSupply.times(pastaPrice)) : 'Locked'}
                   />
                 </div>
               </StyledBalance>
